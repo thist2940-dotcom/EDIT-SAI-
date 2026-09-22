@@ -19,3 +19,7 @@ Permanent rule: never begin the next phase until the current phase APK has been 
 
 
 Build fix note: Phase 2 CI exposed a missing Compose `setContent` import in MainActivity; this was identified from the Actions compiler log and is being corrected without changing Phase 1 behavior.
+
+
+## Phase 2 crash-hardening update
+The video-selection crash path is hardened: persistable URI permission failures are caught, content URIs remain Uri objects, Media3 uses DefaultDataSource.Factory, player creation/release is guarded by DisposableEffect, player errors are shown in the Editor, and CrashLogger saves EDIT_SAI_CRASH_LOG.txt to Downloads via MediaStore with an app-specific fallback on older Android.
