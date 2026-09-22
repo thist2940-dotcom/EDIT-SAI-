@@ -38,3 +38,7 @@ Phases 3–14 remain NOT STARTED. Do not implement them during Phase 2.
 
 ### CI fix
 The first Phase 2 build attempt exposed a compile error in MainActivity (`setContent` unresolved). The fix adds the required Compose Activity `setContent` import and removes an unused import. No Phase 1 behavior is intentionally changed.
+
+
+## Phase 2 crash fix — IN PROGRESS
+A device crash occurred immediately after selecting a DCIM/Camera MP4. The implementation is hardened around URI permission, content URI playback, ExoPlayer construction/release, player errors, and crash-log persistence. Phase 2 remains incomplete until the corrected APK is built and tested on the phone.
