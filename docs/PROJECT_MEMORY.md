@@ -92,3 +92,7 @@ CrashLogger writes the latest uncaught stack trace to the app-private last_crash
 
 ## Future AI handoff
 Read README.md, docs/ROADMAP.md, docs/PHASE_STATUS.md, docs/ERROR_LOG_PLAN.md, and this file before coding. Continue only from the recorded phase/status. Do not assume a later phase has started until the developer confirms the current APK test and authorizes it.
+
+
+## Latest CI fix
+The Phase 2 Actions compiler identified a missing `androidx.activity.compose.setContent` import in MainActivity. The corrective change is limited to the import cleanup; Phase 2 behavior and Phase 1 functionality are preserved.

@@ -16,3 +16,6 @@
 14. Performance optimization — Phase 14 — NOT STARTED
 
 Permanent rule: never begin the next phase until the current phase APK has been tested on the Android device and the user confirms the test.
+
+
+Build fix note: Phase 2 CI exposed a missing Compose `setContent` import in MainActivity; this was identified from the Actions compiler log and is being corrected without changing Phase 1 behavior.

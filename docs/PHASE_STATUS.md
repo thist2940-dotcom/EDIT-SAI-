@@ -34,3 +34,7 @@ Phase 2 is not considered complete until the user tests the new APK on the Andro
 ## Later phases
 
 Phases 3–14 remain NOT STARTED. Do not implement them during Phase 2.
+
+
+### CI fix
+The first Phase 2 build attempt exposed a compile error in MainActivity (`setContent` unresolved). The fix adds the required Compose Activity `setContent` import and removes an unused import. No Phase 1 behavior is intentionally changed.
