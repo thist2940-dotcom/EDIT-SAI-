@@ -35,7 +35,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.media3.common.MediaItem
@@ -75,15 +75,15 @@ private fun EditSaiApp() {
         ) { padding ->
             Column(modifier = Modifier.fillMaxSize()) {
                 if (!lastCrashLog.isNullOrBlank()) {
-                    Text(
-                        "Last crash log available\n$lastCrashLog",
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 12.dp, vertical = 6.dp),
-                        color = MaterialTheme.colorScheme.error,
-                        maxLines = 8,
-                        overflow = TextOverflow.Ellipsis
-                    )
+                    SelectionContainer {
+                        Text(
+                            "Last crash log available\n$lastCrashLog",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 12.dp, vertical = 6.dp),
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    }
                 }
                 if (screen == AppScreen.HOME) {
                     HomeScreen(padding) { screen = it }
