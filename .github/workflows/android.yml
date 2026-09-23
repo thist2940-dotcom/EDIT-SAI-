@@ -52,12 +52,12 @@ jobs:
 
       - name: Rename APK for GitHub Release
         if: success() && github.ref == 'refs/heads/main'
-        run: cp app/build/outputs/apk/debug/app-debug.apk edit-sai-build-${'{'}{ github.run_number }}.apk
+        run: cp app/build/outputs/apk/debug/app-debug.apk edit-sai-build-${{ github.run_number }}.apk
 
       - name: Publish GitHub Release
         if: success() && github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: build-${'{'}{ github.run_number }}
-          name: EDIT SAI Build ${'{'}{ github.run_number }}
-          files: edit-sai-build-${'{'}{ github.run_number }}.apk
+          tag_name: build-${{ github.run_number }}
+          name: EDIT SAI Build ${{ github.run_number }}
+          files: edit-sai-build-${{ github.run_number }}.apk
