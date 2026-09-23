@@ -8,7 +8,7 @@ EDIT SAI is a personal-use Android video editor and animation studio. It is not 
 - No PC and no Android Studio.
 - Code changes are made directly in GitHub.
 - GitHub Actions builds the APK.
-- The APK comes from the GitHub Actions artifact named edit-sai-debug-apk.
+- The APK can be installed directly from the GitHub Releases page; the Actions artifact remains available as a secondary build output.
 
 ## Permanent working rules
 1. Work phase by phase.
@@ -102,3 +102,7 @@ The Phase 2 Actions compiler identified a missing `androidx.activity.compose.set
 The device reported an immediate crash when selecting a DCIM/Camera MP4. The hardened path catches SecurityException and IllegalArgumentException for persistable URI permission, uses the Uri directly, configures Media3 with DefaultDataSource.Factory, creates/releases ExoPlayer in DisposableEffect, catches player setup exceptions, and surfaces Player.Listener errors as Cannot play this video or Cannot read this video. No MediaMetadataRetriever path is used.
 
 CrashLogger now writes EDIT_SAI_CRASH_LOG.txt to the public Downloads collection through MediaStore on Android 10+ and falls back to the app-specific Downloads directory on older Android. On next launch the latest crash log is shown in a selectable banner so the full stack trace can be copied.
+
+
+## Phone install procedure
+Open the repository Releases page in a mobile browser, download the latest .apk asset directly, uninstall the old EDIT SAI app, then install the new APK.
