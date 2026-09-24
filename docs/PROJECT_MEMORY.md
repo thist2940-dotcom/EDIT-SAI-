@@ -58,3 +58,5 @@ Replacement steps:
 - Output filename format is EDIT_SAI_trim_<timestamp>.mp4.
 - Success provides a Snackbar action plus an Open Last Export button.
 - Export failures are shown as friendly errors and logged with CrashLogger.
+
+Phase 3 implementation follow-up: build validation is running in GitHub Actions; no Phase 4 work has started.
