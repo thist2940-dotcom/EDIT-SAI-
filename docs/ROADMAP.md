@@ -26,3 +26,5 @@ The video-selection crash path is hardened: persistable URI permission failures 
 
 ## Phase 3 implementation note
 Trim uses Media3 Transformer with MediaItem clipping and EditedMediaItem. Transformer output is staged in the app cache and then published to public Movies/EDIT_SAI with MediaStore on Android 10+. Export failures are surfaced without crashing and recorded by CrashLogger.
+
+Phase 3 implementation follow-up: build validation is running in GitHub Actions; no Phase 4 work has started.
