@@ -45,3 +45,5 @@ Included:
 
 ## Later phases
 Phases 3–14 remain NOT STARTED.
+
+Phase 3 implementation follow-up: build validation is running in GitHub Actions; no Phase 4 work has started.
