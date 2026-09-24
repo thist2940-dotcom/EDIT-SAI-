@@ -26,6 +26,14 @@ object CrashLogger {
         }
     }
 
+    fun logNonFatal(context: Context, throwable: Throwable, message: String) {
+        runCatching {
+            val stamp = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(Date())
+            val content = "Time: $stamp\nType: Non-fatal\nMessage: $message\n${throwable.stackTraceToString()}"
+            writeCrashLog(context.applicationContext, content)
+        }
+    }
+
     fun readLatest(context: Context): String? {
         return runCatching {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
