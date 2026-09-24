@@ -3,11 +3,13 @@ package com.saigro.editsai
 import android.content.ActivityNotFoundException
 import android.content.ContentResolver
 import android.content.ContentValues
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
+import android.provider.MediaStore
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
@@ -39,11 +41,11 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -73,6 +75,7 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
+import java.util.Locale
 import java.util.Locale
 
 class MainActivity : ComponentActivity() {
@@ -508,114 +511,6 @@ private fun isReadableVideoUri(contentResolver: ContentResolver, uri: Uri): Bool
         false
     }
 }
-
-@Composable
-private fun VideoPlayer(uri: Uri, onError: (String) -> Unit) {
-    val context = LocalContext.current
-    var player by remember(uri) { mutableStateOf<ExoPlayer?>(null) }
-    var isPlaying by remember(uri) { mutableStateOf(false) }
-    var currentPosition by remember(uri) { mutableLongStateOf(0L) }
-    var duration by remember(uri) { mutableLongStateOf(0L) }
-    var sliderPosition by remember(uri) { mutableFloatStateOf(0f) }
-
-    DisposableEffect(uri) {
-        var createdPlayer: ExoPlayer? = null
-        var listener: Player.Listener? = null
-
-        try {
-            val dataSourceFactory = DefaultDataSource.Factory(context)
-            val mediaSourceFactory = DefaultMediaSourceFactory(dataSourceFactory)
-            val newPlayer = ExoPlayer.Builder(context)
-                .setMediaSourceFactory(mediaSourceFactory)
-                .build()
-            createdPlayer = newPlayer
-
-            val newListener = object : Player.Listener {
-                override fun onIsPlayingChanged(playing: Boolean) {
-                    isPlaying = playing
-                }
-
-                override fun onPlaybackStateChanged(playbackState: Int) {
-                    if (playbackState == Player.STATE_READY) {
-                        duration = newPlayer.duration.coerceAtLeast(0L)
-                        currentPosition = newPlayer.currentPosition.coerceAtLeast(0L)
-                        sliderPosition = currentPosition.toSliderValue(duration)
-                    }
-                }
-
-                override fun onPlayerError(error: PlaybackException) {
-                    player = null
-                    onError("Cannot play this video")
-                }
-            }
-            listener = newListener
-            newPlayer.addListener(newListener)
-            newPlayer.setMediaItem(MediaItem.fromUri(uri))
-            newPlayer.prepare()
-            newPlayer.playWhenReady = true
-            player = newPlayer
-        } catch (_: Exception) {
-            createdPlayer?.release()
-            player = null
-            onError("Cannot read this video")
-        }
-
-        onDispose {
-            listener?.let { createdPlayer?.removeListener(it) }
-            createdPlayer?.release()
-            if (player === createdPlayer) player = null
-        }
-    }
-
-    val activePlayer = player
-    LaunchedEffect(activePlayer) {
-        if (activePlayer == null) return@LaunchedEffect
-        while (isActive) {
-            currentPosition = activePlayer.currentPosition.coerceAtLeast(0L)
-            duration = activePlayer.duration.coerceAtLeast(0L)
-            if (duration > 0L) {
-                sliderPosition =
-                    (currentPosition.toFloat() / duration.toFloat()).coerceIn(0f, 1f)
-            }
-            delay(250L)
-        }
-    }
-
-    if (activePlayer != null) {
-        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            AndroidView(
-                factory = { PlayerView(it).apply { player = activePlayer; useController = false } },
-                update = { it.player = activePlayer },
-                modifier = Modifier.fillMaxWidth().weight(1f, fill = false)
-            )
-            Button(
-                onClick = {
-                    if (activePlayer.isPlaying) activePlayer.pause() else activePlayer.play()
-                },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(if (isPlaying) "Pause" else "Play")
-            }
-            Slider(
-                value = sliderPosition,
-                onValueChange = { sliderPosition = it },
-                onValueChangeFinished = {
-                    if (duration > 0L) activePlayer.seekTo((sliderPosition * duration).toLong())
-                },
-                modifier = Modifier.fillMaxWidth(),
-                enabled = duration > 0L
-            )
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(formatDuration(currentPosition))
-                Text(formatDuration(duration))
-            }
-        }
-    }
-}
-
 
 private fun saveExportToMediaStore(
     context: Context,
