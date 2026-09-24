@@ -26,8 +26,9 @@ EDIT SAI is a personal-use Android video editor and animation studio. It is not 
 
 ## Current status
 Phase 1 is COMPLETE and tested on device.
-Phase 2 is IN PROGRESS pending APK build and device confirmation.
-Phase 2.5 is IMPLEMENTED pending APK build and device confirmation.
+Phase 2 is COMPLETE and tested on device.
+Phase 2.5 is COMPLETE and tested on device.
+Phase 3 is IMPLEMENTED and awaiting APK build/device testing.
 
 ## Phase 2.5 — Custom Launcher Icon
 Source portrait filename: ChatGPT Image Sep 23, 2026, 02_47_57 PM.png in the repository root. The supplied image was cropped to a clean 1:1 square portrait for launcher use; the baked-in rounded card and dark outer frame are not used in the launcher asset.
@@ -45,3 +46,15 @@ Replacement steps:
 2. Replace ic_launcher_photo.webp with the new processed portrait.
 3. Keep the adaptive icon XML, foreground inset, background color, and manifest references unless the icon design is intentionally changed.
 4. Build/install a new APK and verify the icon on the launcher and app info screen.
+
+
+## Phase 3 — Basic Trim + Export
+- Editor retains the Phase 2 picker and Media3 playback.
+- Two touch-friendly sliders control trim start/end and display MM:SS.
+- Preview Selection seeks to the selected start and stops at the selected end.
+- Media3 Transformer 1.3.1 exports the clipped MediaItem through EditedMediaItem.
+- Export progress is shown while Transformer runs asynchronously.
+- Output is staged in app cache and published to public Movies/EDIT_SAI using MediaStore on Android 10+.
+- Output filename format is EDIT_SAI_trim_<timestamp>.mp4.
+- Success provides a Snackbar action plus an Open Last Export button.
+- Export failures are shown as friendly errors and logged with CrashLogger.
