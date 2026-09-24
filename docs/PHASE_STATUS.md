@@ -4,7 +4,7 @@
 Status: COMPLETE and tested on device.
 
 ## Phase 2 — Video Import + Playback
-Status: IN PROGRESS; implementation pushed, awaiting GitHub Actions APK verification and phone testing.
+Status: COMPLETE and tested on device.
 
 Included:
 - Editor Select Video using Activity Result Contracts OpenDocument
@@ -19,7 +19,7 @@ Included:
 Phase 2 remains incomplete until the corrected APK is built, installed, tested, and confirmed.
 
 ## Phase 2.5 — Custom Launcher Icon
-Status: IMPLEMENTED; APK build/device test pending.
+Status: COMPLETE and tested on device.
 
 Included:
 - Clean square crop of the supplied portrait
@@ -28,6 +28,20 @@ Included:
 - Legacy/round fallback
 - Manifest icon references
 - No changes to the Phase 1 home screen or Phase 2 video player code
+
+## Phase 3 — Basic Trim + Export
+Status: IMPLEMENTED; APK build and device test pending.
+
+Included:
+- Start/end trim sliders with MM:SS labels
+- Preview Selection bounded by trim end
+- Media3 Transformer 1.3.1 export using MediaItem clipping + EditedMediaItem
+- Visible export progress
+- Public Movies/EDIT_SAI MediaStore save on Android 10+
+- Timestamped EDIT_SAI_trim_<timestamp>.mp4 output
+- Snackbar action and Open Last Export button
+- Friendly export errors logged through CrashLogger
+- Invalid trim range prevention
 
 ## Later phases
 Phases 3–14 remain NOT STARTED.
