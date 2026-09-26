@@ -76,7 +76,6 @@ import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import java.util.Locale
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -170,10 +169,8 @@ private fun EditorScreen(padding: PaddingValues, onBack: () -> Unit) {
     var lastExportUri by remember { mutableStateOf<Uri?>(null) }
     var lastExportName by remember { mutableStateOf<String?>(null) }
     var activeTransformer by remember { mutableStateOf<Transformer?>(null) }
-    val currentTransformer by rememberUpdatedState(activeTransformer)
-
-    DisposableEffect(Unit) {
-        onDispose { currentTransformer?.cancel() }
+    DisposableEffect(exporting) {
+        onDispose { if (!exporting) activeTransformer?.cancel() }
     }
 
     val picker = rememberLauncherForActivityResult(
@@ -775,26 +772,3 @@ private fun VideoPlayer(
     }
 }
 
-private fun Long.toSliderValue(duration: Long): Float =
-    if (duration > 0L) (toFloat() / duration.toFloat()).coerceIn(0f, 1f) else 0f
-
-private fun formatDuration(milliseconds: Long): String {
-    val totalSeconds = milliseconds.coerceAtLeast(0L) / 1000L
-    val hours = totalSeconds / 3600L
-    val minutes = (totalSeconds % 3600L) / 60L
-    val seconds = totalSeconds % 60L
-    return if (hours > 0L) "%d:%02d:%02d".format(hours, minutes, seconds)
-    else "%d:%02d".format(minutes, seconds)
-}
-
-@Composable
-private fun PlaceholderScreen(padding: PaddingValues, screen: AppScreen, onBack: () -> Unit) {
-    Column(
-        modifier = Modifier.fillMaxSize().padding(padding).padding(24.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        Text(screen.label, style = MaterialTheme.typography.headlineMedium)
-        Text("This Phase 1 placeholder is ready for a future feature implementation.")
-        Button(onClick = onBack) { Text("Back to Home") }
-    }
-}
