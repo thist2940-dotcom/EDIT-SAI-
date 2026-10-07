@@ -9,6 +9,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
+import android.media.MediaMetadataRetriever
 import android.provider.MediaStore
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -196,6 +197,12 @@ private fun EditorScreen(padding: PaddingValues, onBack: () -> Unit) {
 
         if (isReadableVideoUri(context.contentResolver, uri)) {
             selectedUri = uri
+            val detectedDuration = readVideoDurationMs(context, uri)
+            if (detectedDuration > 0L) {
+                durationMs = detectedDuration
+                trimStartMs = 0L
+                trimEndMs = detectedDuration
+            }
         } else {
             errorMessage = "Cannot read this video"
         }
@@ -260,6 +267,13 @@ private fun EditorScreen(padding: PaddingValues, onBack: () -> Unit) {
                     MaterialTheme.colorScheme.onBackground
                 }
             )
+
+            if (selectedUri != null && durationMs <= 0L && errorMessage == null) {
+                Text(
+                    "Preparing Trim & Export controls…",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
 
             if (selectedUri != null && durationMs > 0L) {
                 val safeEnd = trimEndMs.coerceIn(1L, durationMs)
@@ -501,6 +515,21 @@ private fun EditorScreen(padding: PaddingValues, onBack: () -> Unit) {
     }
 }
 
+private fun readVideoDurationMs(context: Context, uri: Uri): Long {
+    val retriever = MediaMetadataRetriever()
+    return try {
+        retriever.setDataSource(context, uri)
+        retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
+            ?.toLongOrNull()
+            ?.coerceAtLeast(0L)
+            ?: 0L
+    } catch (_: Exception) {
+        0L
+    } finally {
+        runCatching { retriever.release() }
+    }
+}
+
 private fun isReadableVideoUri(contentResolver: ContentResolver, uri: Uri): Boolean {
     return try {
         contentResolver.openAssetFileDescriptor(uri, "r")?.use { true } ?: false
@@ -642,7 +671,18 @@ private fun VideoPlayer(
                         duration = newPlayer.duration.coerceAtLeast(0L)
                         currentPosition = newPlayer.currentPosition.coerceAtLeast(0L)
                         sliderPosition = currentPosition.toSliderValue(duration)
-                        onDurationChanged(duration)
+                        if (duration > 0L) onDurationChanged(duration)
+                    }
+                }
+
+                override fun onTimelineChanged(
+                    timeline: androidx.media3.common.Timeline,
+                    reason: Int
+                ) {
+                    val timelineDuration = newPlayer.duration.coerceAtLeast(0L)
+                    if (timelineDuration > 0L) {
+                        duration = timelineDuration
+                        onDurationChanged(timelineDuration)
                     }
                 }
 
