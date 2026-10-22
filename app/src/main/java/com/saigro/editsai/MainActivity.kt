@@ -46,6 +46,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -88,6 +89,8 @@ class MainActivity : ComponentActivity() {
         setContent { EditSaiApp() }
     }
 }
+
+private data class TimelineClip(val id: Long, val uri: Uri)
 
 private enum class AppScreen(val label: String) {
     HOME("EDIT SAI"), NEW_PROJECT("New Project"), EDITOR("Editor"),
@@ -163,6 +166,7 @@ private fun EditorScreen(padding: PaddingValues, onBack: () -> Unit) {
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
     var selectedUri by remember { mutableStateOf<Uri?>(null) }
+    val timelineClips = remember { mutableStateListOf<TimelineClip>() }
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var durationMs by remember { mutableLongStateOf(0L) }
     var trimStartMs by remember { mutableLongStateOf(0L) }
@@ -200,6 +204,9 @@ private fun EditorScreen(padding: PaddingValues, onBack: () -> Unit) {
 
         if (isReadableVideoUri(context.contentResolver, uri)) {
             selectedUri = uri
+            if (timelineClips.none { it.uri == uri }) {
+                timelineClips.add(TimelineClip(System.currentTimeMillis(), uri))
+            }
             val detectedDuration = readVideoDurationMs(context, uri)
             if (detectedDuration > 0L) {
                 durationMs = detectedDuration
@@ -208,6 +215,28 @@ private fun EditorScreen(padding: PaddingValues, onBack: () -> Unit) {
             }
         } else {
             errorMessage = "Cannot read this video"
+        }
+    }
+
+    val multiPicker = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenMultipleDocuments()
+    ) { uris ->
+        val readable = uris.filter { isReadableVideoUri(context.contentResolver, it) }
+        readable.forEach { uri ->
+            if (timelineClips.none { it.uri == uri }) {
+                timelineClips.add(TimelineClip(System.currentTimeMillis(), uri))
+            }
+        }
+        val first = readable.firstOrNull()
+        if (first != null && selectedUri == null) {
+            selectedUri = first
+            val detectedDuration = readVideoDurationMs(context, first)
+            durationMs = detectedDuration
+            trimStartMs = 0L
+            trimEndMs = detectedDuration
+        }
+        if (readable.isEmpty() && uris.isNotEmpty()) {
+            errorMessage = "Cannot read the selected videos"
         }
     }
 
@@ -235,6 +264,84 @@ private fun EditorScreen(padding: PaddingValues, onBack: () -> Unit) {
                 enabled = !exporting
             ) {
                 Text(if (selectedUri == null) "Select Video" else "Select Another Video")
+            }
+
+            Button(
+                onClick = { multiPicker.launch(arrayOf("video/*")) },
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !exporting
+            ) {
+                Text("Add Multiple Videos to Timeline")
+            }
+
+            if (timelineClips.isNotEmpty()) {
+                Text("Timeline (${timelineClips.size} clips)", style = MaterialTheme.typography.titleMedium)
+                timelineClips.forEachIndexed { index, clip ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Button(
+                            onClick = {
+                                selectedUri = clip.uri
+                                errorMessage = null
+                                val detectedDuration = readVideoDurationMs(context, clip.uri)
+                                durationMs = detectedDuration
+                                trimStartMs = 0L
+                                trimEndMs = detectedDuration
+                            },
+                            enabled = !exporting,
+                            modifier = Modifier.weight(1f)
+                        ) { Text("Clip ${index + 1}${if (selectedUri == clip.uri) " •" else ""}") }
+                        Button(
+                            onClick = {
+                                timelineClips.add(index + 1, TimelineClip(System.currentTimeMillis(), clip.uri))
+                            },
+                            enabled = !exporting
+                        ) { Text("Duplicate") }
+                        Button(
+                            onClick = {
+                                if (index > 0) {
+                                    val item = timelineClips.removeAt(index)
+                                    timelineClips.add(index - 1, item)
+                                }
+                            },
+                            enabled = !exporting && index > 0
+                        ) { Text("↑") }
+                        Button(
+                            onClick = {
+                                if (index < timelineClips.lastIndex) {
+                                    val item = timelineClips.removeAt(index)
+                                    timelineClips.add(index + 1, item)
+                                }
+                            },
+                            enabled = !exporting && index < timelineClips.lastIndex
+                        ) { Text("↓") }
+                        Button(
+                            onClick = {
+                                timelineClips.removeAt(index)
+                                if (selectedUri == clip.uri && timelineClips.isNotEmpty()) {
+                                    val next = timelineClips.first().uri
+                                    selectedUri = next
+                                    durationMs = readVideoDurationMs(context, next)
+                                    trimStartMs = 0L
+                                    trimEndMs = durationMs
+                                } else if (timelineClips.isEmpty()) {
+                                    selectedUri = null
+                                    durationMs = 0L
+                                    trimStartMs = 0L
+                                    trimEndMs = 0L
+                                }
+                            },
+                            enabled = !exporting
+                        ) { Text("Delete") }
+                    }
+                }
+                Text(
+                    "Timeline order is saved in this editing session. Select a clip to trim it; export currently exports the selected clip only.",
+                    style = MaterialTheme.typography.bodySmall
+                )
             }
 
             selectedUri?.let { uri ->
