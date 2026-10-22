@@ -30,7 +30,7 @@ Included:
 - No changes to the Phase 1 home screen or Phase 2 video player code
 
 ## Phase 3 — Basic Trim + Export
-Status: IMPLEMENTED; APK build and device test pending.
+Status: IN PROGRESS; controls visibility and export require build/device verification.
 
 Included:
 - Start/end trim sliders with MM:SS labels
@@ -43,7 +43,17 @@ Included:
 - Friendly export errors logged through CrashLogger
 - Invalid trim range prevention
 
-## Later phases
-Phases 3–14 remain NOT STARTED.
+## Phase 4 — Core Multi-Clip Timeline
+Status: IN PROGRESS; initial timeline controls implemented, APK validation pending.
 
-Phase 3 implementation follow-up: build validation is running in GitHub Actions; no Phase 4 work has started.
+Included so far:
+- Import multiple videos into a session timeline
+- Select a clip for playback and trim controls
+- Duplicate, reorder, and delete timeline entries
+- Scrollable editor layout so trim/export controls are reachable on smaller screens
+
+Limitations still to implement or verify:
+- Export currently exports the selected clip's trim range, not a merged multi-clip timeline
+- Split-at-playhead, persistent project save/autosave, undo/redo, crop/rotate/flip, and full multi-clip export are not complete
+
+Phases 3 and 4 are being developed together at the user's request. Build and on-device testing are still pending; neither phase is marked complete.
