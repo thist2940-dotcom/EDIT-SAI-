@@ -28,7 +28,7 @@ EDIT SAI is a personal-use Android video editor and animation studio. It is not 
 Phase 1 is COMPLETE and tested on device.
 Phase 2 is COMPLETE and tested on device.
 Phase 2.5 is COMPLETE and tested on device.
-Phase 3 is IMPLEMENTED and awaiting APK build/device testing.
+Phases 3 and 4 are being developed together at the user's request. The editor now has a scrollable layout and initial multi-clip timeline controls (multi-import, select, duplicate, reorder, delete). Trim/export and runtime behavior are still unverified on device; export currently targets the selected clip only. Do not mark phases complete until the user tests and confirms the APK.
 
 ## Phase 2.5 — Custom Launcher Icon
 Source portrait filename: ChatGPT Image Sep 23, 2026, 02_47_57 PM.png in the repository root. The supplied image was cropped to a clean 1:1 square portrait for launcher use; the baked-in rounded card and dark outer frame are not used in the launcher asset.
@@ -59,4 +59,10 @@ Replacement steps:
 - Success provides a Snackbar action plus an Open Last Export button.
 - Export failures are shown as friendly errors and logged with CrashLogger.
 
-Phase 3 implementation follow-up: build validation is running in GitHub Actions; no Phase 4 work has started.
+Combined Phase 3+4 implementation update:
+- Editor screen is vertically scrollable so controls below the player remain reachable on phone screens.
+- Player preview is height-limited to 220dp to preserve room for editing controls.
+- Multi-select video import populates a session-only timeline; entries can be selected, duplicated, moved up/down, and deleted.
+- Persistable read permissions are attempted for multi-selected document URIs with safe exception handling.
+- Export error messages include the reported Transformer exception message to aid diagnosis.
+- Current limitation: export trims the selected source clip only; it does not yet concatenate the timeline. Build/CI and phone testing are pending.
