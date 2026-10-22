@@ -221,7 +221,17 @@ private fun EditorScreen(padding: PaddingValues, onBack: () -> Unit) {
     val multiPicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenMultipleDocuments()
     ) { uris ->
-        val readable = uris.filter { isReadableVideoUri(context.contentResolver, it) }
+        val readable = uris.filter { uri ->
+            try {
+                context.contentResolver.takePersistableUriPermission(
+                    uri,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
+            } catch (_: SecurityException) {
+            } catch (_: IllegalArgumentException) {
+            }
+            isReadableVideoUri(context.contentResolver, uri)
+        }
         readable.forEach { uri ->
             if (timelineClips.none { it.uri == uri }) {
                 timelineClips.add(TimelineClip(System.currentTimeMillis(), uri))
@@ -299,7 +309,7 @@ private fun EditorScreen(padding: PaddingValues, onBack: () -> Unit) {
                                 timelineClips.add(index + 1, TimelineClip(System.currentTimeMillis(), clip.uri))
                             },
                             enabled = !exporting
-                        ) { Text("Duplicate") }
+                        ) { Text("Dup") }
                         Button(
                             onClick = {
                                 if (index > 0) {
@@ -335,7 +345,7 @@ private fun EditorScreen(padding: PaddingValues, onBack: () -> Unit) {
                                 }
                             },
                             enabled = !exporting
-                        ) { Text("Delete") }
+                        ) { Text("Del") }
                     }
                 }
                 Text(
@@ -541,7 +551,7 @@ private fun EditorScreen(padding: PaddingValues, onBack: () -> Unit) {
                                         exportException,
                                         "Phase 3 trim export failed"
                                     )
-                                    errorMessage = "Could not export this trimmed video"
+                                    errorMessage = "Export failed: " + (exportException.message ?: "unsupported video format")
                                 }
                             })
                             .build()
