@@ -355,6 +355,13 @@ private fun EditorScreen(padding: PaddingValues, onBack: () -> Unit) {
             }
 
             selectedUri?.let { uri ->
+                errorMessage?.let { message ->
+                    Text(
+                        message,
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
                 VideoPlayer(
                     uri = uri,
                     trimStartMs = trimStartMs,
