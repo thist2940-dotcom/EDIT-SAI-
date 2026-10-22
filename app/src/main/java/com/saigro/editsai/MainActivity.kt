@@ -22,6 +22,9 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -223,7 +226,7 @@ private fun EditorScreen(padding: PaddingValues, onBack: () -> Unit) {
 
     Box(modifier = Modifier.fillMaxSize().padding(padding)) {
         Column(
-            modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),
+            modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp).verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Button(
@@ -770,7 +773,7 @@ private fun VideoPlayer(
                     }
                 },
                 update = { it.player = activePlayer },
-                modifier = Modifier.fillMaxWidth().weight(1f, fill = false)
+                modifier = Modifier.fillMaxWidth().height(220.dp)
             )
 
             Button(
