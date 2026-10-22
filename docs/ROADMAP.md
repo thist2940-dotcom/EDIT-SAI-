@@ -3,8 +3,8 @@
 1. Foundation / app shell — Phase 1 — COMPLETE
 2. Video import and playback — Phase 2 — COMPLETE
 2.5. Custom launcher icon — Phase 2.5 — COMPLETE
-3. Basic timeline and trim — Phase 3 — IMPLEMENTED (APK test pending)
-4. Split, multi-clip, speed, and audio — Phase 4 — NOT STARTED
+3. Basic timeline and trim — Phase 3 — IN PROGRESS (controls visibility and export need device verification)
+4. Core multi-clip timeline — Phase 4 — IN PROGRESS (multi-import, select, duplicate, reorder, delete; more editing tools remain)
 5. Text, stickers, and overlays — Phase 5 — NOT STARTED
 6. Effects engine — Phase 6 — NOT STARTED
 7. Transition engine — Phase 7 — NOT STARTED
@@ -27,4 +27,4 @@ The video-selection crash path is hardened: persistable URI permission failures 
 ## Phase 3 implementation note
 Trim uses Media3 Transformer with MediaItem clipping and EditedMediaItem. Transformer output is staged in the app cache and then published to public Movies/EDIT_SAI with MediaStore on Android 10+. Export failures are surfaced without crashing and recorded by CrashLogger.
 
-Phase 3 implementation follow-up: build validation is running in GitHub Actions; no Phase 4 work has started.
+Combined Phase 3+4 update: the editor now uses a scrollable layout so trim/export controls are reachable, and adds a multi-video timeline with select, duplicate, reorder, and delete controls. Export still targets the selected clip only. Build and device validation are pending; do not mark either phase complete until the user tests the APK.
