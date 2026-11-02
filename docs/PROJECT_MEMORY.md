@@ -28,7 +28,7 @@ EDIT SAI is a personal-use Android video editor and animation studio. It is not 
 Phase 1 is COMPLETE and tested on device.
 Phase 2 is COMPLETE and tested on device.
 Phase 2.5 is COMPLETE and tested on device.
-Phases 3 and 4 are being developed together at the user's request. The editor now has a scrollable layout and initial multi-clip timeline controls (multi-import, select, duplicate, reorder, delete). Trim/export and runtime behavior are still unverified on device; export currently targets the selected clip only. Do not mark phases complete until the user tests and confirms the APK.
+Phases 3 and 4 are code-complete and awaiting on-device APK verification. Do not mark phases complete until the user tests and confirms the APK.
 
 ## Phase 2.5 — Custom Launcher Icon
 Source portrait filename: ChatGPT Image Sep 23, 2026, 02_47_57 PM.png in the repository root. The supplied image was cropped to a clean 1:1 square portrait for launcher use; the baked-in rounded card and dark outer frame are not used in the launcher asset.
@@ -47,22 +47,15 @@ Replacement steps:
 3. Keep the adaptive icon XML, foreground inset, background color, and manifest references unless the icon design is intentionally changed.
 4. Build/install a new APK and verify the icon on the launcher and app info screen.
 
-
-## Phase 3 — Basic Trim + Export
+## Phase 3 & Phase 4 — Trim, Export, and Core Multi-Clip Timeline
 - Editor retains the Phase 2 picker and Media3 playback.
-- Two touch-friendly sliders control trim start/end and display MM:SS.
-- Preview Selection seeks to the selected start and stops at the selected end.
-- Media3 Transformer 1.3.1 exports the clipped MediaItem through EditedMediaItem.
-- Export progress is shown while Transformer runs asynchronously.
-- Output is staged in app cache and published to public Movies/EDIT_SAI using MediaStore on Android 10+.
-- Output filename format is EDIT_SAI_trim_<timestamp>.mp4.
-- Success provides a Snackbar action plus an Open Last Export button.
-- Export failures are shown as friendly errors and logged with CrashLogger.
-
-Combined Phase 3+4 implementation update:
-- Editor screen is vertically scrollable so controls below the player remain reachable on phone screens.
-- Player preview is height-limited to 220dp to preserve room for editing controls.
-- Multi-select video import populates a session-only timeline; entries can be selected, duplicated, moved up/down, and deleted.
-- Persistable read permissions are attempted for multi-selected document URIs with safe exception handling.
-- Export error messages include the reported Transformer exception message to aid diagnosis.
-- Current limitation: export trims the selected source clip only; it does not yet concatenate the timeline. Build/CI and phone testing are pending.
+- Scrollable layout with 220dp player preview height so all controls below the player remain reachable on phone screens.
+- Each `TimelineClip` stores a unique ID, URI, duration, independent `trimStartMs`/`trimEndMs`, `rotationDegrees`, `flipHorizontal`, `flipVertical`, and `cropPreset`.
+- Multi-select and single-select video import populate the timeline; clips can be selected, duplicated, moved up/down, split at playhead, and deleted.
+- Split at Playhead divides the selected clip at the current player position into two sequential timeline clips preserving their trim bounds.
+- Undo / Redo stack tracks up to 30 timeline snapshots across clip imports, trim adjustments, splits, reorders, duplicates, deletes, and transforms.
+- Persistent project autosave and restore (`edit_sai_timeline_project.json` in internal filesDir) saves timeline edits automatically and skips unreadable URIs safely on load.
+- Per-clip Transform & Crop controls (`Rotate 90°`, `Flip H`, `Flip V`, `Full`/`16:9`/`9:16`/`1:1`) preview live in the player and export through Media3 `ScaleAndRotateTransformation` and `Presentation`.
+- Export supports both **Export Trimmed Video (Selected Clip)** (`EDIT_SAI_trim_<timestamp>.mp4`) and **Export Full Timeline (N Clips Merged)** (`EDIT_SAI_timeline_<timestamp>.mp4`) via Media3 `EditedMediaItemSequence` and `Composition` (`setForceAudioTrack(true)` for multi-clip safety).
+- Output is staged in app cache and published to public `Movies/EDIT_SAI` using `MediaStore` on Android 10+.
+- Export failures are shown as friendly errors and logged with `CrashLogger`.

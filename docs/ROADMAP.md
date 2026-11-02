@@ -3,8 +3,8 @@
 1. Foundation / app shell — Phase 1 — COMPLETE
 2. Video import and playback — Phase 2 — COMPLETE
 2.5. Custom launcher icon — Phase 2.5 — COMPLETE
-3. Basic timeline and trim — Phase 3 — IN PROGRESS (controls visibility and export need device verification)
-4. Core multi-clip timeline — Phase 4 — IN PROGRESS (multi-import, select, duplicate, reorder, delete; more editing tools remain)
+3. Basic timeline and trim — Phase 3 — IN PROGRESS (code complete; awaiting device APK verification)
+4. Core multi-clip timeline — Phase 4 — IN PROGRESS (multi-import, per-clip trim, split at playhead, undo/redo, persistent autosave/restore, rotate/flip/crop, and merged multi-clip export implemented; awaiting device APK verification)
 5. Text, stickers, and overlays — Phase 5 — NOT STARTED
 6. Effects engine — Phase 6 — NOT STARTED
 7. Transition engine — Phase 7 — NOT STARTED
@@ -23,8 +23,5 @@ Build fix note: Phase 2 CI exposed a missing Compose setContent import in MainAc
 ## Phase 2 crash-hardening update
 The video-selection crash path is hardened: persistable URI permission failures are caught, content URIs remain Uri objects, Media3 uses DefaultDataSource.Factory, player creation/release is guarded by DisposableEffect, player errors are shown in the Editor, and CrashLogger saves EDIT_SAI_CRASH_LOG.txt to Downloads via MediaStore with an app-specific fallback on older Android.
 
-
-## Phase 3 implementation note
-Trim uses Media3 Transformer with MediaItem clipping and EditedMediaItem. Transformer output is staged in the app cache and then published to public Movies/EDIT_SAI with MediaStore on Android 10+. Export failures are surfaced without crashing and recorded by CrashLogger.
-
-Combined Phase 3+4 update: the editor now uses a scrollable layout so trim/export controls are reachable, and adds a multi-video timeline with select, duplicate, reorder, and delete controls. Export still targets the selected clip only. Build and device validation are pending; do not mark either phase complete until the user tests the APK.
+## Phase 3 + Phase 4 implementation note
+Trim and multi-clip export use Media3 Transformer 1.3.1 with `MediaItem` clipping, `EditedMediaItem`, `EditedMediaItemSequence`, and `Composition`. Per-clip transforms (rotation, horizontal/vertical flip, aspect-ratio crop) use Media3 `ScaleAndRotateTransformation` and `Presentation`. Timeline state is autosaved locally to `edit_sai_timeline_project.json` and supports 30-step Undo/Redo and Split at Playhead. Transformer output is staged in the app cache and published to public `Movies/EDIT_SAI` with `MediaStore` on Android 10+. Do not mark Phase 3 or Phase 4 complete until the user tests and confirms the APK on device.

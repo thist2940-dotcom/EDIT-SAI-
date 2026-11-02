@@ -16,8 +16,6 @@ Included:
 - Friendly non-fatal media/player errors
 - No broad storage permission
 
-Phase 2 remains incomplete until the corrected APK is built, installed, tested, and confirmed.
-
 ## Phase 2.5 — Custom Launcher Icon
 Status: COMPLETE and tested on device.
 
@@ -30,10 +28,10 @@ Included:
 - No changes to the Phase 1 home screen or Phase 2 video player code
 
 ## Phase 3 — Basic Trim + Export
-Status: IN PROGRESS; controls visibility and export require build/device verification.
+Status: IN PROGRESS; code complete, awaiting on-device APK verification.
 
 Included:
-- Start/end trim sliders with MM:SS labels
+- Start/end trim sliders with MM:SS labels per clip
 - Preview Selection bounded by trim end
 - Media3 Transformer 1.3.1 export using MediaItem clipping + EditedMediaItem
 - Visible export progress
@@ -44,16 +42,17 @@ Included:
 - Invalid trim range prevention
 
 ## Phase 4 — Core Multi-Clip Timeline
-Status: IN PROGRESS; initial timeline controls implemented, APK validation pending.
+Status: IN PROGRESS; code complete, awaiting on-device APK verification.
 
-Included so far:
-- Import multiple videos into a session timeline
-- Select a clip for playback and trim controls
-- Duplicate, reorder, and delete timeline entries
-- Scrollable editor layout so trim/export controls are reachable on smaller screens
+Included:
+- Import single or multiple videos into a timeline with independent per-clip state (unique ID, trim range, transforms)
+- Select a clip for playback, trim, split, and transform controls
+- Duplicate, reorder (up/down), and delete timeline entries
+- Split at Playhead: splits the selected clip at the current playhead into two consecutive timeline clips
+- Undo / Redo stack (up to 30 snapshots) across timeline, trim, split, and transform edits
+- Persistent project autosave and restore (`edit_sai_timeline_project.json`) with unreadable-URI safety + New Project screen actions
+- Crop / Rotate / Flip per clip: 90° rotation, horizontal flip, vertical flip, and aspect-ratio crop presets (`Full`, `16:9`, `9:16`, `1:1`) with live player preview and Media3 export effects (`ScaleAndRotateTransformation`, `Presentation`)
+- Full multi-clip merged timeline export (`EDIT_SAI_timeline_<timestamp>.mp4`) via `EditedMediaItemSequence` and `Composition` alongside single-clip export (`EDIT_SAI_trim_<timestamp>.mp4`)
+- Scrollable editor layout so all timeline, trim, transform, and export controls remain reachable on phone screens
 
-Limitations still to implement or verify:
-- Export currently exports the selected clip's trim range, not a merged multi-clip timeline
-- Split-at-playhead, persistent project save/autosave, undo/redo, crop/rotate/flip, and full multi-clip export are not complete
-
-Phases 3 and 4 are being developed together at the user's request. Build and on-device testing are still pending; neither phase is marked complete.
+Phases 3 and 4 are developed together at the user's request. Neither phase is marked COMPLETE until the user tests and confirms the APK on device.

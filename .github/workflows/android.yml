@@ -2,7 +2,7 @@ name: Android CI
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ main, master, 'arena/**' ]
   pull_request:
     branches: [ main, master ]
 
@@ -51,11 +51,11 @@ jobs:
           if-no-files-found: error
 
       - name: Rename APK for GitHub Release
-        if: success() && github.ref == 'refs/heads/main'
+        if: success() && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/arena/'))
         run: cp app/build/outputs/apk/debug/app-debug.apk edit-sai-build-${{ github.run_number }}.apk
 
       - name: Publish GitHub Release
-        if: success() && github.ref == 'refs/heads/main'
+        if: success() && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/arena/'))
         uses: softprops/action-gh-release@v2
         with:
           tag_name: build-${{ github.run_number }}
