@@ -64,6 +64,7 @@ import androidx.media3.common.Effect
 import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
+import androidx.media3.common.audio.AudioProcessor
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.datasource.DefaultDataSource
 import androidx.media3.effect.Presentation
@@ -150,10 +151,10 @@ private object ProjectStorage {
     fun load(context: Context): TimelineSnapshot? {
         return runCatching {
             val file = File(context.filesDir, PROJECT_FILE_NAME)
-            if (!file.exists()) return null
+            if (!file.exists()) return@runCatching null
             val root = JSONObject(file.readText())
             val savedSelectedId = root.optLong("selectedClipId", -1L).takeIf { it > 0L }
-            val arr = root.optJSONArray("clips") ?: return null
+            val arr = root.optJSONArray("clips") ?: return@runCatching null
             val loaded = mutableListOf<TimelineClip>()
             for (i in 0 until arr.length()) {
                 val obj = arr.optJSONObject(i) ?: continue
@@ -193,7 +194,7 @@ private object ProjectStorage {
                     )
                 )
             }
-            if (loaded.isEmpty()) return null
+            if (loaded.isEmpty()) return@runCatching null
             val resolvedSelected = savedSelectedId?.takeIf { id -> loaded.any { it.id == id } }
                 ?: loaded.first().id
             TimelineSnapshot(loaded, resolvedSelected)
@@ -529,7 +530,7 @@ private fun EditorScreen(padding: PaddingValues, onBack: () -> Unit) {
             val videoEffects = buildClipVideoEffects(clip)
             val editedBuilder = EditedMediaItem.Builder(mediaItem)
             if (videoEffects.isNotEmpty()) {
-                editedBuilder.setEffects(Effects(emptyList(), videoEffects))
+                editedBuilder.setEffects(Effects(emptyList<AudioProcessor>(), videoEffects))
             }
             editedItems.add(editedBuilder.build())
         }
@@ -720,9 +721,9 @@ private fun EditorScreen(padding: PaddingValues, onBack: () -> Unit) {
             }
 
             if (timelineClips.isNotEmpty()) {
-                val totalTimelineMs = timelineClips.sumOf { clip ->
+                val totalTimelineMs = timelineClips.fold(0L) { acc, clip ->
                     val end = if (clip.trimEndMs > clip.trimStartMs) clip.trimEndMs else clip.durationMs
-                    (end - clip.trimStartMs).coerceAtLeast(0L)
+                    acc + (end - clip.trimStartMs).coerceAtLeast(0L)
                 }
                 Text(
                     "Timeline (${timelineClips.size} clips • Total ${formatDuration(totalTimelineMs)})",

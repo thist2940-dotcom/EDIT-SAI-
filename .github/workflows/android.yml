@@ -35,7 +35,15 @@ jobs:
           chmod +x ./gradlew
 
       - name: Build debug APK
-        run: ./gradlew assembleDebug --stacktrace
+        run: |
+          set +e
+          ./gradlew assembleDebug --stacktrace 2>&1 | tee build.log
+          EXIT_CODE=${PIPESTATUS[0]}
+          if [ $EXIT_CODE -ne 0 ]; then
+            ERR_SUMMARY=$(grep -E "e: |FAILURE:|What went wrong|Execution failed|Exception" build.log | head -n 25 | tr '\n' ' ')
+            echo "::error title=Gradle Build Error::$ERR_SUMMARY"
+            exit $EXIT_CODE
+          fi
         continue-on-error: false
 
       - name: Fallback build without wrapper
