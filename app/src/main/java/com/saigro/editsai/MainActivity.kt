@@ -620,7 +620,7 @@ private fun EditorScreen(padding: PaddingValues, onBack: () -> Unit) {
             } else {
                 val sequence = EditedMediaItemSequence(editedItems)
                 val composition = Composition.Builder(listOf(sequence))
-                    .setForceAudioTrack(true)
+                    .experimentalSetForceAudioTrack(true)
                     .build()
                 transformer.start(composition, tempFile.absolutePath)
             }
