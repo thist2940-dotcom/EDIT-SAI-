@@ -1,0 +1,45 @@
+{
+  "total_seconds": 40.0,
+  "fps": 30,
+  "size": [
+    1080,
+    1920
+  ],
+  "sources": [
+    {
+      "key": "00_hook",
+      "dur": 3.0,
+      "mode": "still"
+    },
+    {
+      "key": "01_narwhal",
+      "dur": 7.0,
+      "mode": "still"
+    },
+    {
+      "key": "02_glassfrog",
+      "dur": 7.0,
+      "mode": "still"
+    },
+    {
+      "key": "03_fairyarmadillo",
+      "dur": 7.0,
+      "mode": "still"
+    },
+    {
+      "key": "04_goblinshark",
+      "dur": 7.0,
+      "mode": "still"
+    },
+    {
+      "key": "05_bluedragon",
+      "dur": 6.0,
+      "mode": "still"
+    },
+    {
+      "key": "06_outro",
+      "dur": 3.0,
+      "mode": "still"
+    }
+  ]
+}

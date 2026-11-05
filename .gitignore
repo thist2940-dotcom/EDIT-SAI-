@@ -23,3 +23,8 @@ captures/
 .externalNativeBuild/
 .DS_Store
 Thumbs.db
+
+# Short builder intermediates
+short/build/
+short/videos/*
+!short/videos/.gitkeep
